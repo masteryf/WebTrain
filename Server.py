@@ -22,7 +22,7 @@ while True:
     # 接收客户端发送的指令
     command = client_socket.recv(1024).decode()
 
-    if command == '1':
+    if command == '10001':
         print("接收文件并训练")
         client_socket.sendall("训练".encode())
         # 接收文件
@@ -41,7 +41,7 @@ while True:
             file_data = file.read()
             client_socket.sendall(file_data)
 
-    elif command == '2':
+    elif command == '10002':
         print("接收文件并预测")
         client_socket.sendall("预测".encode())
         # 接收文件
@@ -60,7 +60,7 @@ while True:
         #     file_data = file.read()
         #     client_socket.sendall(file_data)
 
-    elif command == '3':
+    elif command == '10004':
         print("获取设备信息...")
         # 获取设备信息
         cpu_usage = psutil.cpu_percent(interval=1)
