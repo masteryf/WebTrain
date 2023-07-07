@@ -52,7 +52,7 @@ if res['message'] == "200":
             get_file(file_name)
             print(file_name + "：文件已经接收")
             ## 训练文件
-            filename = Train_From_CSV(in_path=data_path+file_name, out_path=weight_path)
+            filename = Train_From_CSV(in_path=data_path+file_name, out_path=weight_path)# in_path为输入的训练文件路径，out_path为输出的.pth模型文件路径,返回值为输出文件名字
             ## post发送请求上传文件（分片）
             send_file(file_name=filename,path=weight_path,sock=sock)
 
@@ -62,7 +62,7 @@ if res['message'] == "200":
             get_file(file_name, data_path, sock)
             print(file_name + "：文件已经接收")
             ## 预测文件
-            label = prediction(path=data_path+file_name)
+            label = prediction(path=data_path+file_name,weight_path = "")#path为预测的文件的路径,weight为使用的模型的路径
             ## 上传文件
             send_msg(label,sock)
 

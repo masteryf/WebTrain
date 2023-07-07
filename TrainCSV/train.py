@@ -45,4 +45,4 @@ def Train_From_CSV(in_path, out_path, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.de
         test_line.test(model, DEVICE, test_loader)
         torch.save(NN.state_dict(), out_path + starttime + ".pth")
 
-    return out_path + starttime + ".pth"
+    return starttime + ".pth"
