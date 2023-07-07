@@ -23,3 +23,5 @@ def get_file(fileName, path, sock):
                 file.close()
                 break
             file.write(response_data)
+def send_file(fileName, path, sock):
+    return

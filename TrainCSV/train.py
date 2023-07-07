@@ -1,9 +1,8 @@
-import torch
 import pandas as pd
 from torch import optim
 from torch.utils.data import Dataset
 from pandas.core.frame import DataFrame
-from utils.MyDataset_FromCSV_Data import MyDataset
+from utils.dataset.MyDataset_FromCSV_Data import MyDataset
 from Models.Model import *
 from TrainCSV.trainUtils import test_line
 from TrainCSV.trainUtils import train_line
@@ -11,9 +10,9 @@ import time
 import datetime
 
 
-def Train_From_CSV(path, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+def Train_From_CSV(in_path, out_path, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
                    LEARNRATE=0.00001):
-    df: DataFrame = pd.read_csv(path, encoding='utf-8')
+    df: DataFrame = pd.read_csv(in_path, encoding='utf-8')
     df.fillna(df.mean(), inplace=True)  # 处理缺失值，用每一列的平均值填充
 
     # 标准化数据
@@ -44,6 +43,6 @@ def Train_From_CSV(path, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.device("cuda" i
         print(LEARNRATE)
         train_line.train(model, DEVICE, train_loader, optimizer, epoch)
         test_line.test(model, DEVICE, test_loader)
-        torch.save(NN.state_dict(), "weights/" + starttime + ".pth")
+        torch.save(NN.state_dict(), out_path + starttime + ".pth")
 
-    return "weights/" + starttime + ".pth"
+    return out_path + starttime + ".pth"

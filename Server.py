@@ -1,6 +1,11 @@
 import socket
 from utils.webConnect.webconnect import *
+from TrainCSV.train import Train_From_CSV
+from Prediction.Prediction import prediction
+import GPUtil
 
+gpus = GPUtil.getGPUs()
+gpu0 = gpus[0]
 
 # 服务器地址和端口号
 server_address = ('localhost', 8000)
@@ -26,7 +31,8 @@ file_msg = {
     "bytes": bytearray
 }
 
-path = ""
+data_path = "Data/"
+weight_path = "weights/"
 # 连接到服务器
 sock.connect(server_address)
 
@@ -46,24 +52,26 @@ if res['message'] == "200":
             get_file(file_name)
             print(file_name + "：文件已经接收")
             ## 训练文件
-
+            filename = Train_From_CSV(in_path=data_path+file_name, out_path=weight_path)
             ## post发送请求上传文件（分片）
+            send_file(file_name=filename,path=weight_path,sock=sock)
 
         if res['message'] == "forecast":
             # 接收文件
             file_name = res['fileName']
-            get_file(file_name, path, sock)
+            get_file(file_name, data_path, sock)
             print(file_name + "：文件已经接收")
-            ## 训练文件
-
+            ## 预测文件
+            label = prediction(path=data_path+file_name)
             ## 上传文件
+            send_msg(label,sock)
 
         if res['message'] == "info":
             info_msg['gpu_info'].append({
                 '名称': "cpu1",
-                '显存总量': 1024,
-                '显存占用率': 1024 * 100,
-                'GPU占用率': 1024 * 100
+                '显存总量': gpu0.memoryTotal,
+                '显存占用率': gpu0.memoryUtil * 100,
+                'GPU占用率': gpu0.load * 100
             })
             send_msg(info_msg, sock)
             info_msg = []
