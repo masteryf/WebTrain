@@ -1,99 +1,76 @@
 import socket
-import psutil
-import GPUtil
-from TrainCSV.train import Train_From_CSV
-from Prediction.Prediction import prediction
+from utils.webConnect.webconnect import *
 
-# 服务器地址和端口
-server_address = ('localhost', 8888)
 
-# 创建TCP socket
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(server_address)
-server_socket.listen(1)
+# 服务器地址和端口号
+server_address = ('localhost', 8000)
 
-print("等待客户端连接...")
+# 创建一个TCP套接字
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-while True:
-    # 接受客户端连接
-    client_socket, client_address = server_socket.accept()
-    print("客户端已连接:", client_address)
+receive = {
+    "code": 10000,
+}
 
-    # 接收客户端发送的指令
-    command = client_socket.recv(1024).decode()
+info_msg = {
+    "identifier": "",
+    "filename": "",
+    "totalChunks": 3,
+    "chunkNumber": 4,
+    "totalSize": 5,
+    "file": "文件"
+}
 
-    if command == '10001':
-        print("接收文件并训练")
-        client_socket.sendall("训练".encode())
-        # 接收文件
-        file_data = client_socket.recv(1024)
-        with open('Data/data.csv', 'wb') as file:
-            while file_data:
-                file.write(file_data)
-                file_data = client_socket.recv(1024)
+file_msg = {
+    "code": 20001,
+    "bytes": bytearray
+}
 
-        print("接收完成")
-        # 执行代码块1
-        filename = Train_From_CSV(path='Data/data.csv')
+path = ""
+# 连接到服务器
+sock.connect(server_address)
 
-        # 返回处理后的文件
-        with open(filename, 'rb') as file:
-            file_data = file.read()
-            client_socket.sendall(file_data)
+# 声明自己是数据接收端
+send_msg(receive, sock)
+res = json.loads(get_response(sock).decode())
 
-    elif command == '10002':
-        print("接收文件并预测")
-        client_socket.sendall("预测".encode())
-        # 接收文件
-        file_data = client_socket.recv(1024)
-        with open('Data/data.csv', 'wb') as file:
-            while file_data:
-                file.write(file_data)
-                file_data = client_socket.recv(1024)
+if res['message'] == "200":
+    print("与服务器建立连接成功！")
+    while True:
+        res = json.loads(get_response(sock).decode())
+        print(res)
 
-        # 执行代码块2
-        output = prediction(path='Data/data.csv')
-        client_socket.sendall(output.encode())
+        if res['message'] == "train":
+            # 接收文件
+            file_name = res['fileName']
+            get_file(file_name)
+            print(file_name + "：文件已经接收")
+            ## 训练文件
 
-        # # 返回处理后的文件
-        # with open('processed_file.txt', 'rb') as file:
-        #     file_data = file.read()
-        #     client_socket.sendall(file_data)
+            ## post发送请求上传文件（分片）
 
-    elif command == '10004':
-        print("获取设备信息...")
-        # 获取设备信息
-        cpu_usage = psutil.cpu_percent(interval=1)
-        memory = psutil.virtual_memory()
-        memory_usage = memory.percent
+        if res['message'] == "forecast":
+            # 接收文件
+            file_name = res['fileName']
+            get_file(file_name, path, sock)
+            print(file_name + "：文件已经接收")
+            ## 训练文件
 
-        # 获取GPU信息
-        gpus = GPUtil.getGPUs()
-        gpu_info = []
-        for gpu in gpus:
-            gpu_info.append({
-                '名称': gpu.name,
-                '显存总量': gpu.memoryTotal,
-                '显存占用率': gpu.memoryUtil * 100,
-                'GPU占用率': gpu.load * 100
+            ## 上传文件
+
+        if res['message'] == "info":
+            info_msg['gpu_info'].append({
+                '名称': "cpu1",
+                '显存总量': 1024,
+                '显存占用率': 1024 * 100,
+                'GPU占用率': 1024 * 100
             })
+            send_msg(info_msg, sock)
+            info_msg = []
 
-        # 构造设备信息的字符串
-        device_info = "CPU占用率: {}%\n内存占用率: {}%\n\n".format(cpu_usage, memory_usage)
-        device_info += "GPU信息:\n"
-        for gpu in gpu_info:
-            device_info += "名称: {}\n显存总量: {}\n显存占用率: {}%\nGPU占用率: {}%\n\n".format(
-                gpu['名称'], gpu['显存总量'], gpu['显存占用率'], gpu['GPU占用率']
-            )
+        ## 监听消息
+        res = get_response(sock)
 
-        # 返回设备信息
-        client_socket.sendall(device_info.encode())
 
-    else:
-        print("未知指令")
-
-    # 关闭连接
-    client_socket.close()
-
-# 关闭服务器socket
-server_socket.close()
+else:
+    print("与服务器建立连接失败")

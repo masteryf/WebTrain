@@ -5,8 +5,8 @@ from torch.utils.data import Dataset
 from pandas.core.frame import DataFrame
 from utils.MyDataset_FromCSV_Data import MyDataset
 from Models.Model import *
-from utils import test_line
-from utils import train_line
+from TrainCSV.trainUtils import test_line
+from TrainCSV.trainUtils import train_line
 import time
 import datetime
 
