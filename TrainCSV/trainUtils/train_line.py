@@ -1,8 +1,8 @@
 import torch
 import torch.nn.functional as F
 import time
-
-def train(model, device, train_loader, optimizer, epoch):
+from utils.webConnect.webconnect import *
+def train(model, device, train_loader, optimizer, epoch, sock):
     model.train()
     start_time = time.time() # 记录开始时间
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -17,7 +17,10 @@ def train(model, device, train_loader, optimizer, epoch):
             print('TrainCSV Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                        100. * batch_idx / len(train_loader), loss.item()))
+            send_msg('TrainCSV Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(train_loader.dataset),
+                       100. * batch_idx / len(train_loader), loss.item()),sock)
     end_time = time.time() # 记录结束时间
-    print("Training time for epoch {}: {:.2f} seconds".format(epoch, end_time - start_time)) # 计算并打印用时
+    # print("Training time for epoch {}: {:.2f} seconds".format(epoch, end_time - start_time)) # 计算并打印用时
 
 

@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
-
-def test(model, device, test_loader):
+from utils.webConnect.webconnect import *
+def test(model, device, test_loader, sock):
     model.eval()
     test_loss = 0
     with torch.no_grad():
@@ -13,3 +13,4 @@ def test(model, device, test_loader):
 
     test_loss /= len(test_loader.dataset)
     print('\nTest set: Average loss: {:.4f}\n'.format(test_loss))
+    send_msg('\nTest set: Average loss: {:.4f}\n'.format(test_loss),sock)
