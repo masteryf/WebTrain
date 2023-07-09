@@ -10,7 +10,7 @@ import time
 import datetime
 
 
-def Train_From_CSV(in_path, out_path,sock, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+def Train_From_CSV(in_path, out_path, sock, echo, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
                    LEARNRATE=0.00001, ):
     df: DataFrame = pd.read_csv(in_path, encoding='utf-8')
     df.fillna(df.mean(), inplace=True)  # 处理缺失值，用每一列的平均值填充
@@ -36,13 +36,13 @@ def Train_From_CSV(in_path, out_path,sock, BATCH_SIZE=32, EPOCHS=100, DEVICE=tor
 
     timestamp = time.time()
     datetime_obj = datetime.datetime.fromtimestamp(timestamp)
-    starttime = datetime_obj.strftime('%Y-%m-%d %H:%M:%S')
+    starttime = datetime_obj.strftime('%Y-%m-%d_%H-%M-%S')
 
     for epoch in range(1, EPOCHS + 1):
         LEARNRATE *= 0.95
         print(LEARNRATE)
-        train_line.train(model, DEVICE, train_loader, optimizer, epoch, sock)
-        test_line.test(model, DEVICE, test_loader, sock)
-        torch.save(NN.state_dict(), out_path + starttime + ".pth")
+        train_line.train(model, DEVICE, train_loader, optimizer, epoch, sock, echo)
+        test_line.test(model, DEVICE, test_loader, sock, echo)
+        torch.save(model.state_dict(), out_path + starttime + ".pth")
 
     return starttime + ".pth"

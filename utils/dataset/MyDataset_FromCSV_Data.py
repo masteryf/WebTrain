@@ -6,7 +6,7 @@ from pandas.core.frame import DataFrame
 class MyDataset(Dataset):
     def __init__(self, df: DataFrame) -> None:
         self.data = df
-        self.features = [f'feature{i}' for i in range(106)]
+        self.features = [f'feature{i}' for i in range(107)]
 
     def __len__(self) -> int:
         return len(self.data)

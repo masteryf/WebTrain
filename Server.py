@@ -2,6 +2,7 @@ import socket
 from utils.webConnect.webconnect import *
 from TrainCSV.train import Train_From_CSV
 from Prediction.Prediction import prediction
+from utils.csvnorm.csvnorm import process_csv
 import GPUtil
 
 gpus = GPUtil.getGPUs()
@@ -52,7 +53,8 @@ if res['message'] == "200":
             get_file(file_name)
             print(file_name + "：文件已经接收")
             ## 训练文件
-            filename = Train_From_CSV(in_path=data_path+file_name, out_path=weight_path)# in_path为输入的训练文件路径，out_path为输出的.pth模型文件路径,返回值为输出文件名字
+            process_csv(input_file=data_path+file_name,output_file=data_path+"norm_"+file_name)
+            filename = Train_From_CSV(in_path=data_path+"norm_"+file_name, out_path=weight_path)# in_path为输入的训练文件路径，out_path为输出的.pth模型文件路径,返回值为输出文件名字
             ## post发送请求上传文件（分片）
             send_file(file_name=filename,path=weight_path,sock=sock)
 
