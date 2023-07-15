@@ -64,7 +64,8 @@ if res['message'] == "200":
             get_file(file_name, data_path, sock)
             print(file_name + "：文件已经接收")
             ## 预测文件
-            label = prediction(path=data_path+file_name,weight_path = "")#path为预测的文件的路径,weight为使用的模型的路径
+            process_csv(input_file=data_path + file_name, output_file=data_path + "norm_" + file_name)
+            label = prediction(path=data_path + "norm_" + file_name,weight_path = "weights/defalut.pth")#path为预测的文件的路径,weight为使用的模型的路径
             ## 上传文件
             send_msg(label,sock)
 

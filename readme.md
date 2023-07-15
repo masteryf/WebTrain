@@ -1,7 +1,13 @@
 # 运行Server.py来启动
 
-
-
+## 性能：
+| 设备                      | 单论epoch时间 |
+|-------------------------|-----------|
+| ryzen9_5900HX    | 110s      | 
+| NVIDIA Geforce RTX 4090 | 10.6s     | 
+| NVIDIA Tesla A40        | 13.6s     |
+| NVIDIA A100 80GB        | 8.2s      | 
+5-10轮在训练集上即可达到大部分精度![acc.png](photos%2Facc.png)
 ## 训练方法：
 
 导入：
