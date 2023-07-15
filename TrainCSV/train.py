@@ -10,7 +10,7 @@ import time
 import datetime
 
 
-def Train_From_CSV(in_path, out_path, sock, echo, BATCH_SIZE=32, EPOCHS=100, DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+def Train_From_CSV(in_path, out_path, sock, echo, BATCH_SIZE=32, EPOCHS=20, DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
                    LEARNRATE=0.00001, ):
     df: DataFrame = pd.read_csv(in_path, encoding='utf-8')
     df.fillna(df.mean(), inplace=True)  # 处理缺失值，用每一列的平均值填充
